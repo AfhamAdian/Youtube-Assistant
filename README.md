@@ -14,15 +14,16 @@ git clone https://github.com/AfhamAdian/Youtube-Assistant.git
 ```
 npm i
 ```
-```
-npm start
-```
 #### 4. Create a .env file and copy the following in the file. Change the API_KEY with your own gemini api key.
 ```
 API_KEY = "Your-GEMINI-API-KEY"
 PORT = 3000
 ```
-#### 5. Head to localhost:3000
+#### 5. Start server with 
+```
+npm start
+```
+#### 6. Head to localhost:3000
 
 
 # How to use the Assistant:
