@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube Assistant</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto' ;
+            margin: 20px;
+            background-color: #212121; /* Dark background */
+            color: #f5f5f5; /* Light text color */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #2e2e2e; /* Darker background for the container */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-family: 'Roboto' ;
+
+            text-align: center;
+            color: #3498db; /* Accent color */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-family: 'Roboto' ;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #e0e0e0; /* Light label color */
+        }
+
+        input[type="url"], input[type="text"] {
+            font-family: 'Roboto' ;
+
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            background:#2F2F2F; /* Dark background for inputs */
+            color: #D4CBCE; /* Light text color for inputs */
+        }
+
+        button {
+            font-family: 'Roboto' ;
+            
+            width: 8%;
+            height: 30px;
+            align-self: left;
+            padding: 4px 15px;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            color: 	#D4CBCE;
+            background-color:  #2980b9; ; /* Accent color */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Slightly darker shade for hover */
+        }
+
+        .scrollpane {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Default alignment for assistant messages */
+            justify-content: flex-start;
+
+            font-family: 'Roboto';
+            width: 98%;
+            height: 270px;
+            overflow-y: auto;
+            border: 1px solid #444; /* Slightly lighter border color */
+            border-radius: 4px;
+            padding: 10px;
+            background: #222; /* Dark background for scroll pane */
+            color: #f5f5f5; /* Light text color for scroll pane */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        #spinner {
+
+            border: 8px solid #444; /* Darker grey, making the border thinner for a smaller spinner */
+            border-top: 8px solid #f5f5f5; /* Accent color */
+            border-radius: 50%;
+            width: 40px; /* Smaller width */
+            height: 40px; /* Smaller height */
+            animation: spin 1.5s linear infinite;
+            position: fixed;
+            right: 45%; /* Position from the right edge */
+            bottom: 15px; /* Position from the bottom edge */
+            display: none; /* Initially hidden, shown during loading */        
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .messageAssistant {
+            font-family: 'Roboto' ;
+            width: 80%;
+            align-self: left;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 15px;
+            background: #2F2F2F; /* Dark background for messages */
+            color: #f5f5f5; /* Light text color */
+            font-size: 14px;
+        }
+
+        .messageUser{
+            display: inline-block; /* Resize to fit content */
+            max-width: 80%; /* Limit maximum width */
+            min-width: 15%;
+            padding: 10px; /* Add some padding */
+            margin: 10px 0 10px 0; /* Margin for spacing */
+            border-radius: 15px; /* Rounded corners */
+            background: #2F2F2F; /* Background color */
+            color: #f5f5f5; /* Text color */
+            font-size: 14px; /* Font size */
+            box-sizing: border-box; /* Ensure padding and border are included in the element's total width */
+            align-self: flex-end; /* Aligns the div to the right */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- <h1>Submit Your Details</h1> -->
+
+        <form action='' method="post">
+            <label for="videoLink">Video Link:</label>
+            <input type="url" id="videoLink" name="videoLink" placeholder="Enter video URL">
+            <button type="submit" onclick="submitVideoLink(event)">Submit</button>
+        </form>
+
+        <form action='' method="post">
+            <label for="message">Your Message:</label>
+            <input type="text" id="message" name="message" placeholder="Enter your message">
+            <button type="submit" onclick="sendMessage(event)">Send</button>
+        </form>
+
+        <div class="scrollpane" id="answersPane">
+            <!-- Answers will be appended here -->
+        </div>
+
+        <div id="spinner"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function submitVideoLink(event) {
+            event.preventDefault();
+            const videoLink = document.getElementById('videoLink').value;
+            
+            showSpinner();
+            axios.post('/submitVideoLink', { videoLink: videoLink })
+                .then(response => {
+                    console.log('Success: ', response.data);
+
+                    const allReplies = response.data.payLoad;
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('messageAssistant');
+                    messageElement.textContent = allReplies; // Set the text content to the server message
+                    
+                    // Append the new element to the scroll pane
+                    const scrollPane = document.getElementById('answersPane');
+                    scrollPane.appendChild(messageElement);
+                })
+                .catch(error => {
+                    console.error('Error: ', error);
+                })
+                .finally(() => {
+                    hideSpinner();
+                });
+        }
+        
+        function sendMessage(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            
+            showSpinner();
+            axios.post('/sendMessage', { message: message })
+                .then(response => {
+                    console.log('Success: ', response.data);
+                    
+                    // Assistant Div
+                    const allReplies = response.data.payLoad;
+                    const messageElement = document.createElement('div');
+                    messageElement.classList.add('messageAssistant');             // like give it a token for styling with css
+                    const allRepliesWithLineBreaks = allReplies.replace(/\n/g, '<br>');
+                    messageElement.innerHTML = allRepliesWithLineBreaks; // Set the text content to the server message
+                    
+                    // User Div
+                    const userQues = response.data.userQues;
+                    const userQuesElement = document.createElement('div');
+                    userQuesElement.classList.add('messageUser');
+                    const userQuesWithLineBreaks = userQues.replace(/\n/g, '<br>');
+                    userQuesElement.innerHTML = userQuesWithLineBreaks; // Set the text content to the server message
+
+                    // Clear previous content and append the new element to the scroll pane
+                    const scrollPane = document.getElementById('answersPane');
+                    scrollPane.appendChild(userQuesElement);
+                    scrollPane.appendChild(messageElement);
+                })
+                .catch(error => {
+                    console.error('Error: ', error);
+                })
+                .finally(() => {
+                    hideSpinner();
+                });
+        }
+        
+        // Loading spinner functions
+        function showSpinner() {
+            document.getElementById('spinner').style.display = 'block';
+        }
+        
+        function hideSpinner() {
+            document.getElementById('spinner').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
