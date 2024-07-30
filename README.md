@@ -1,4 +1,4 @@
-# YouTube-Assistant
+# YouTube-Assistant powered by Gemini
 
 # Introduction 
 This is a youtube video assistant that uses the transcript from the video and answers questions related to the video.
@@ -10,9 +10,10 @@ With help of this you dont need to watch the whole video to get your questions a
 ```
 git clone https://github.com/AfhamAdian/Youtube-Assistant.git
 ```
-#### 2. Open the Directory on VS Code a ies with these commands.
+#### 2. Open the Directory on VS Code and open a new terminal.
+#### 3. Install dependencies.
 ```
-npm i
+npm install
 ```
 #### 4. Create a .env file and copy the following in the file. Change the API_KEY with your own gemini api key.
 ```
